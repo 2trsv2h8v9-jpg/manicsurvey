@@ -660,8 +660,7 @@
     const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
     badge.className = 'meta-pill ' + (live ? 'live' : 'offline');
     badge.textContent = live
-      ? `Data langsung dari spreadsheet · diperbarui ${timeStr}`
-      : `Menampilkan data tersimpan terakhir · ${timeStr}`;
+    
 
     renderSummary(allSchools);
     renderStudentFilterOptions(allSchools);
