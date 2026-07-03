@@ -5,16 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dashboard Kesiapan IBDP</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg: #0e1116;
-    --panel: #161b22;
-    --panel-border: #262c36;
-    --text: #e8ebf0;
-    --text-dim: #8a93a3;
-    --accent: #5eead4;
-    --accent-soft: rgba(94,234,212,0.12);
+    --bg: #f3f5fb;
+    --card-bg: #ffffff;
+    --card-border: #e6e9f2;
+    --text: #1e2433;
+    --text-dim: #6b7386;
+    --header-start: #4338ca;
+    --header-end: #2563eb;
+    --blue: #2563eb;
+    --violet: #7c3aed;
+    --amber: #d97706;
+    --emerald: #059669;
     --font-display: 'Segoe UI', system-ui, sans-serif;
     --font-mono: 'Consolas', 'Courier New', monospace;
   }
@@ -25,174 +28,157 @@
     color: var(--text);
     font-family: var(--font-display);
     min-height: 100vh;
-    padding: 32px 20px 60px;
   }
-  .wrap{ max-width: 1100px; margin: 0 auto; }
-
-  header{ margin-bottom: 24px; }
-  .eyebrow{
+  .header{
+    background: linear-gradient(120deg, var(--header-start), var(--header-end));
+    color: white;
+    padding: 28px 24px;
+  }
+  .header .eyebrow{
     font-family: var(--font-mono);
     font-size: 12px;
     letter-spacing: 2px;
-    color: var(--accent);
     text-transform: uppercase;
+    opacity: 0.8;
     margin-bottom: 6px;
   }
-  h1{ margin:0; font-size: 26px; font-weight: 700; }
-  .subtitle{ color: var(--text-dim); margin-top: 6px; font-size: 14px; }
+  .header h1{ margin: 0; font-size: 26px; font-weight: 700; }
+  .header .subtitle{ opacity: 0.85; margin-top: 6px; font-size: 14px; }
+
+  .wrap{ max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
 
   .config-box{
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
+    background: #fffbea;
+    border: 1px solid #fde68a;
     border-radius: 10px;
-    padding: 16px 18px;
-    margin-bottom: 24px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
     font-size: 13px;
-    color: var(--text-dim);
+    color: #92400e;
   }
   .config-box code{
-    color: var(--accent);
+    color: #92400e;
     font-family: var(--font-mono);
-    background: var(--accent-soft);
+    background: #fef3c7;
     padding: 2px 6px;
     border-radius: 4px;
   }
 
-  #status{
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-  }
-  #status.error{ color: #f87171; }
-  #status.ok{ color: var(--accent); }
+  #status{ font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); margin-bottom: 18px; }
+  #status.error{ color: #dc2626; }
+  #status.ok{ color: var(--emerald); }
 
   .stats-row{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 14px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   .stat-card{
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
     padding: 16px 18px;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04);
   }
-  .stat-label{
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 8px;
-  }
-  .stat-value{
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text);
-  }
+  .stat-label{ font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  .stat-value{ font-size: 24px; font-weight: 700; }
 
-  .panel{
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-  .panel h2{
-    margin: 0 0 4px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .panel .hint{
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-bottom: 16px;
-  }
-
-  select, input[type="text"]{
+  .search-row{ margin-bottom: 20px; }
+  #searchBox{
     width: 100%;
-    background: #0b0e13;
-    border: 1px solid var(--panel-border);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     color: var(--text);
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border-radius: 10px;
     font-size: 14px;
     font-family: var(--font-display);
-    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04);
   }
-  select:focus, input:focus{ outline: 2px solid var(--accent); outline-offset: 1px; }
+  #searchBox:focus{ outline: 2px solid var(--blue); outline-offset: 1px; }
 
-  .chart-holder{ position: relative; height: 300px; }
-
-  table{ width:100%; border-collapse: collapse; font-size: 13px; }
-  th, td{
-    text-align: left;
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--panel-border);
+  .school-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
   }
-  th{
-    color: var(--text-dim);
+  .school-card{
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.06);
+  }
+  .school-card h3{ margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+
+  .cat-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--card-border);
+  }
+  .cat-row:last-of-type{ border-bottom: none; }
+  .cat-label{ display:flex; align-items:center; gap: 8px; color: var(--text); }
+  .dot{ width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .cat-count{ color: var(--text-dim); font-family: var(--font-mono); font-size: 12px; }
+
+  .detail-toggle{
+    width: 100%;
+    margin-top: 14px;
+    background: #eef2ff;
+    color: var(--header-start);
+    border: none;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 600;
-    font-size: 11px;
+    cursor: pointer;
+    font-family: var(--font-display);
+  }
+  .detail-toggle:hover{ background: #e0e7ff; }
+
+  .detail-panel{ display:none; margin-top: 14px; }
+  .detail-panel.open{ display:block; }
+  .detail-cat-title{
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    position: sticky;
-    top: 0;
-    background: var(--panel);
+    margin: 14px 0 6px;
   }
-  tr:hover td{ background: rgba(255,255,255,0.02); }
-  .table-scroll{ max-height: 420px; overflow-y: auto; }
+  .qa-item{ font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f3f9; }
+  .qa-q{ color: var(--text-dim); margin-bottom: 2px; }
+  .qa-a{ font-weight: 600; }
 
-  footer{
-    text-align:center;
-    color: var(--text-dim);
-    font-size: 12px;
-    margin-top: 32px;
-  }
+  footer{ text-align:center; color: var(--text-dim); font-size: 12px; margin-top: 32px; }
 </style>
 </head>
 <body>
+
+<div class="header">
+  <div class="eyebrow">Dashboard Survei</div>
+  <h1>Kesiapan Otorisasi IBDP</h1>
+  <div class="subtitle">Hasil survey mandiri kesiapan implementasi IBDP di MAN IC seluruh Indonesia.</div>
+</div>
+
 <div class="wrap">
 
-  <header>
-    <div class="eyebrow">Dashboard Survei</div>
-    <h1>Kesiapan Otorisasi IBDP</h1>
-    <div class="subtitle">Ringkasan hasil self-assessment dari sekolah-sekolah yang mengisi survei.</div>
-  </header>
-
-  <div class="config-box">
-    ⚙️ <b>Cara pakai:</b> ganti nilai <code>SHEET_CSV_URL</code> di bagian bawah file ini
-    dengan link "Publish to web → CSV" dari Google Sheets kamu.
-  </div>
+  
 
   <div id="status">Mengambil data...</div>
 
   <div class="stats-row" id="statsRow"></div>
 
-  <div class="panel">
-    <h2>Sebaran Jawaban per Kriteria</h2>
-    <div class="hint">Pilih satu kriteria/pertanyaan untuk melihat bagaimana 22 sekolah menjawabnya.</div>
-    <select id="questionPicker"></select>
-    <div class="chart-holder">
-      <canvas id="distChart"></canvas>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2>Jawaban per Sekolah</h2>
-    <div class="hint">Menampilkan jawaban tiap sekolah untuk kriteria yang dipilih di atas. Ketik nama sekolah untuk mencari.</div>
+  <div class="search-row">
     <input type="text" id="searchBox" placeholder="Cari nama sekolah..." />
-    <div class="table-scroll">
-      <table id="dataTable">
-        <thead><tr><th>Sekolah</th><th id="answerColHead">Jawaban</th></tr></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
   </div>
 
-  <footer>Dibuat dengan HTML + Chart.js, di-hosting di Vercel.</footer>
+  <div class="school-grid" id="schoolGrid"></div>
+
+  <footer>Dibuat dengan HTML, di-hosting di Vercel.</footer>
 </div>
 
 <script>
@@ -202,21 +188,81 @@
   // ============================================================
   const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTw7LMGC2kouIIudvFQ92fjDoD7-YQGGe4WizeTgf1uvR5pDg1biJLeBCDZBUgxUYDUOE0oftjluTLA/pub?output=csv";
 
-  // Nama kolom yang berisi nama sekolah (harus sama persis dengan header di sheet)
   const SCHOOL_COLUMN = "Sebutkan nama sekolah Anda";
-  // Kolom yang tidak dianggap "kriteria" (jadi tidak muncul di dropdown)
   const IGNORE_COLUMNS = ["Timestamp", SCHOOL_COLUMN];
+
+  // Pengelompokan kriteria ke 4 area (murni pengelompokan, bukan penilaian baik/buruk)
+  const CATEGORIES = {
+    leadership: { label: "Kepemimpinan & SDM", color: "#2563eb" },
+    curriculum: { label: "Kurikulum & Pembelajaran", color: "#7c3aed" },
+    facility:   { label: "Fasilitas & Teknologi", color: "#d97706" },
+    admin:      { label: "Administrasi & Pembiayaan", color: "#059669" },
+    other:      { label: "Lainnya", color: "#6b7386" },
+  };
+
+  const COLUMN_CATEGORY = {
+    "Kepala sekolah memiliki kemampuan Bahasa Inggris aktif": "leadership",
+    "Minimal sebagian guru mampu mengajar dalam Bahasa Inggris": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Bahasa Indonesia]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Bahasa Inggris]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Matematika]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Economy]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [History]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Biology]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Chemistry]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Physics]": "leadership",
+    "Guru memiliki latar belakang akademik sesuai mata pelajaran": "leadership",
+    "Sekolah memiliki guru dengan pengalaman mengajar kurikulum internasional": "leadership",
+    "Kepala sekolah pernah mengikuti workshop profesional dari IBDP.": "leadership",
+    "Sekolah dapat menunjuk PIC khusus untuk pengembangan IB Diploma Programme.": "leadership",
+    "Sekolah memiliki konselor perguruan tinggi dan atau guru bimbingan konseling.": "leadership",
+    "Sekolah memiliki staf IT yang mendukung implementasi pembelajaran digital.": "leadership",
+    "Sekolah memiliki asisten laboratorium sains.": "leadership",
+
+    "Guru terbiasa membuat perencanaan pembelajaran": "curriculum",
+    "Guru terbiasa menggunakan student-centered learning*\n\n*student-centered learning: pembelajaran yang mendorong siswa aktif bertanya, berdiskusi, mengeksplorasi, dan membangun pemahaman sendiri.": "curriculum",
+    "Sekolah memiliki sistem pengecekan plagiarisme seperti Turnitin atau Google for Education.": "curriculum",
+    "Sekolah memiliki sistem pelaporan hasil belajar siswa.": "curriculum",
+    "Sekolah memiliki LMS pembelajaran.": "curriculum",
+
+    "Ruang kelas memiliki proyektor atau smart TV.": "facility",
+    "Koneksi internet stabil di area belajar utama.": "facility",
+    "Guru memiliki akses laptop atau perangkat digital.": "facility",
+    "Siswa kelas 10 sampai 12 memiliki akses perangkat digital untuk pembelajaran.": "facility",
+    "Laboratorium sains tersedia dan dapat digunakan. [Lab biologi]": "facility",
+    "Laboratorium sains tersedia dan dapat digunakan. [Lab kimia]": "facility",
+    "Laboratorium sains tersedia dan dapat digunakan. [Lab fisika]": "facility",
+    "Laboratorium memiliki standar keamanan dasar (P3K, APK, selimut api, dll).": "facility",
+    "Perpustakaan tersedia.": "facility",
+    "Perpustakaan memiliki system pencatatan buku (contoh OPAC).": "facility",
+    "Perpustakaan memiliki sumber belajar berbahasa Inggris.": "facility",
+
+    "Sekolah memiliki ruang bimbingan konseling.": "admin",
+    "Sekolah memahami estimasi biaya IB": "admin",
+    "Sekolah memiliki biaya pengembangan profesional guru": "admin",
+  };
 
   const statusEl = document.getElementById('status');
   const statsRow = document.getElementById('statsRow');
-  const picker = document.getElementById('questionPicker');
-  const tableBody = document.getElementById('tableBody');
-  const answerColHead = document.getElementById('answerColHead');
   const searchBox = document.getElementById('searchBox');
+  const schoolGrid = document.getElementById('schoolGrid');
 
   let ROWS = [];
   let QUESTION_COLUMNS = [];
-  let chartInstance = null;
+  let GROUPED = {}; // catKey -> [columns]
+
+  function shortLabel(col){
+    return col.length > 90 ? col.slice(0, 90) + '…' : col;
+  }
+
+  function buildGroups(){
+    GROUPED = {};
+    Object.keys(CATEGORIES).forEach(k => GROUPED[k] = []);
+    QUESTION_COLUMNS.forEach(col => {
+      const cat = COLUMN_CATEGORY[col] || "other";
+      GROUPED[cat].push(col);
+    });
+  }
 
   function renderStats(){
     const schools = new Set(ROWS.map(r => r[SCHOOL_COLUMN])).size;
@@ -233,69 +279,52 @@
     `).join('');
   }
 
-  function shortLabel(col){
-    return col.length > 70 ? col.slice(0, 70) + '…' : col;
+  function schoolCardHTML(row, idx){
+    const name = row[SCHOOL_COLUMN] || '(Tanpa nama)';
+
+    const catRows = Object.entries(GROUPED).filter(([k,cols]) => cols.length > 0).map(([key, cols]) => {
+      const filled = cols.filter(c => (row[c] || '').toString().trim() !== '').length;
+      const cat = CATEGORIES[key];
+      return `
+        <div class="cat-row">
+          <span class="cat-label"><span class="dot" style="background:${cat.color}"></span>${cat.label}</span>
+          <span class="cat-count">${filled}/${cols.length} terisi</span>
+        </div>`;
+    }).join('');
+
+    const detailHTML = Object.entries(GROUPED).filter(([k,cols]) => cols.length > 0).map(([key, cols]) => {
+      const cat = CATEGORIES[key];
+      const items = cols.map(c => `
+        <div class="qa-item">
+          <div class="qa-q">${shortLabel(c)}</div>
+          <div class="qa-a" style="color:${cat.color}">${row[c] || '(kosong)'}</div>
+        </div>
+      `).join('');
+      return `<div class="detail-cat-title" style="color:${cat.color}">${cat.label}</div>${items}`;
+    }).join('');
+
+    return `
+      <div class="school-card" data-name="${name.toLowerCase()}">
+        <h3>${name}</h3>
+        ${catRows}
+        <button class="detail-toggle" onclick="toggleDetail(${idx})">Lihat Detail Jawaban</button>
+        <div class="detail-panel" id="detail-${idx}">${detailHTML}</div>
+      </div>
+    `;
   }
 
-  function populatePicker(){
-    picker.innerHTML = QUESTION_COLUMNS.map((c, i) =>
-      `<option value="${i}">${shortLabel(c)}</option>`
-    ).join('');
-  }
+  window.toggleDetail = function(idx){
+    document.getElementById('detail-' + idx).classList.toggle('open');
+  };
 
-  function renderDistribution(col){
-    const counts = {};
-    ROWS.forEach(r => {
-      const val = (r[col] || '(kosong)').toString().trim() || '(kosong)';
-      counts[val] = (counts[val] || 0) + 1;
-    });
-    const labels = Object.keys(counts);
-    const data = Object.values(counts);
-
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(document.getElementById('distChart'), {
-      type: 'bar',
-      data: {
-        labels: labels.map(l => l.length > 28 ? l.slice(0,28) + '…' : l),
-        datasets: [{
-          data,
-          backgroundColor: 'rgba(94,234,212,0.55)',
-          borderColor: '#5eead4',
-          borderWidth: 1,
-          borderRadius: 4,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        indexAxis: 'y',
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: '#8a93a3', precision: 0 }, grid: { color: '#262c36' } },
-          y: { ticks: { color: '#8a93a3' }, grid: { color: '#262c36' } }
-        }
-      }
-    });
-  }
-
-  function renderTable(col, filterText){
-    answerColHead.textContent = shortLabel(col);
+  function renderGrid(filterText){
     const filtered = ROWS.filter(r =>
       !filterText || (r[SCHOOL_COLUMN] || '').toLowerCase().includes(filterText.toLowerCase())
     );
-    tableBody.innerHTML = filtered.map(r => `
-      <tr><td>${r[SCHOOL_COLUMN] || ''}</td><td>${r[col] || ''}</td></tr>
-    `).join('');
+    schoolGrid.innerHTML = filtered.map((r, i) => schoolCardHTML(r, i)).join('');
   }
 
-  function refreshView(){
-    const col = QUESTION_COLUMNS[picker.value];
-    renderDistribution(col);
-    renderTable(col, searchBox.value);
-  }
-
-  picker.addEventListener('change', refreshView);
-  searchBox.addEventListener('input', refreshView);
+  searchBox.addEventListener('input', () => renderGrid(searchBox.value));
 
   function loadData(){
     Papa.parse(SHEET_CSV_URL, {
@@ -310,12 +339,12 @@
           return;
         }
         QUESTION_COLUMNS = results.meta.fields.filter(c => !IGNORE_COLUMNS.includes(c));
+        buildGroups();
         statusEl.textContent = `Berhasil memuat ${ROWS.length} respons dari sekolah.`;
         statusEl.className = 'ok';
 
         renderStats();
-        populatePicker();
-        refreshView();
+        renderGrid('');
       },
       error: function(err){
         statusEl.textContent = 'Gagal mengambil data: ' + err.message + '. Pastikan link CSV benar dan sheet sudah di-publish.';
