@@ -406,10 +406,7 @@
       <p class="eyebrow">Penilaian Kesiapan Program IB Diploma</p>
       <h1>Dashboard Kesiapan Implementasi IBDP</h1>
       <p class="subtitle">Memetakan kesiapan setiap sekolah untuk mengadopsi International Baccalaureate Diploma Programme, berdasarkan kesiapan implementasi kurikulum dan kesiapan infrastruktur — diurutkan dari yang paling siap.</p>
-      <div class="hero-meta">
-        <span id="lastUpdated" class="meta-pill">Memuat data…</span>
-        <button id="refreshBtn" class="refresh-btn" type="button">Segarkan data</button>
-      </div>
+      
     </div>
     <svg class="rosette" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="75" cy="75" r="70" stroke="#8B85C1" stroke-opacity="0.18" stroke-width="1.5"/>
@@ -649,31 +646,21 @@
   }
 
   async function init(refreshing = false){
-    const badge = document.getElementById('lastUpdated');
-    const btn = document.getElementById('refreshBtn');
-    if(refreshing){ btn.disabled = true; btn.textContent = 'Menyegarkan…'; }
+    
 
     const { rows, live } = await loadData();
     allSchools = rows;
 
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-    badge.className = 'meta-pill ' + (live ? 'live' : 'offline');
-    badge.textContent = live
-      ? `Data langsung dari spreadsheet · diperbarui ${timeStr}`
-      : `Menampilkan data tersimpan terakhir · ${timeStr}`;
+
 
     renderSummary(allSchools);
     renderStudentFilterOptions(allSchools);
     renderCards();
 
-    if(refreshing){ btn.disabled = false; btn.textContent = 'Segarkan data'; }
-  }
-
   document.getElementById('searchInput').addEventListener('input', renderCards);
   document.getElementById('tierFilter').addEventListener('change', renderCards);
   document.getElementById('studentFilter').addEventListener('change', renderCards);
-  document.getElementById('refreshBtn').addEventListener('click', () => init(true));
+  
 
   init();
 </script>
