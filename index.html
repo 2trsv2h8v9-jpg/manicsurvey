@@ -112,18 +112,31 @@
   }
   .school-card h3{ margin: 0 0 12px; font-size: 16px; font-weight: 700; }
 
-  .cat-row{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 13px;
-    padding: 6px 0;
+  .cat-block{
+    padding: 8px 0;
     border-bottom: 1px dashed var(--card-border);
   }
-  .cat-row:last-of-type{ border-bottom: none; }
-  .cat-label{ display:flex; align-items:center; gap: 8px; color: var(--text); }
+  .cat-block:last-of-type{ border-bottom: none; }
+  .cat-label{ display:flex; align-items:center; gap: 8px; color: var(--text); font-size: 13px; font-weight: 600; margin-bottom: 6px; }
   .dot{ width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-  .cat-count{ color: var(--text-dim); font-family: var(--font-mono); font-size: 12px; }
+  .highlight-box{
+    background: #f8f9fc;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+  }
+  .highlight-q{ color: var(--text-dim); margin-bottom: 2px; }
+  .highlight-a{ font-weight: 700; }
+  .highlight-empty{ color: var(--text-dim); font-style: italic; }
+  .disclaimer{
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    background: #f8f9fc;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
 
   .detail-toggle{
     width: 100%;
@@ -161,12 +174,10 @@
 <div class="header">
   <div class="eyebrow">Dashboard Survei</div>
   <h1>Kesiapan Otorisasi IBDP</h1>
-  <div class="subtitle">Hasil survey mandiri kesiapan implementasi IBDP di MAN IC seluruh Indonesia.</div>
+  <div class="subtitle">Ringkasan self-assessment per sekolah, dikelompokkan berdasarkan area kesiapan.</div>
 </div>
 
 <div class="wrap">
-
-  
 
   <div id="status">Mengambil data...</div>
 
@@ -175,6 +186,8 @@
   <div class="search-row">
     <input type="text" id="searchBox" placeholder="Cari nama sekolah..." />
   </div>
+
+  <div class="disclaimer">✨ Sorotan tiap kategori dipilih otomatis berdasarkan kata kunci pada jawaban. Untuk pertanyaan yang jawabannya bukan skala bagus/kurang (misal pilihan jenis kurikulum), sorotan tidak dipaksakan — klik "Lihat Detail Jawaban" untuk semua jawaban asli.</div>
 
   <div class="school-grid" id="schoolGrid"></div>
 
@@ -242,6 +255,64 @@
     "Sekolah memiliki biaya pengembangan profesional guru": "admin",
   };
 
+  // Kamus kata kunci untuk menebak "seberapa positif" sebuah jawaban (0=kurang, 4=terbaik).
+  // Dicocokkan dari frasa terpanjang dulu supaya "belum tersedia" tidak salah kena "tersedia".
+  const KEYWORD_RANKS = [
+    { kw: "sangat baik", rank: 4 }, { kw: "sangat memadai", rank: 4 },
+    { kw: "ada dan aktif digunakan", rank: 4 }, { kw: "tersedia & aktif", rank: 4 },
+    { kw: "ada untuk semua lab", rank: 4 }, { kw: "rutin tersedia", rank: 4 },
+    { kw: "sudah digunakan secara aktif", rank: 4 }, { kw: "sudah ada pic", rank: 4 },
+    { kw: "sudah menggunakan sistem berbayar", rank: 4 }, { kw: "ya, sebagian besar", rank: 4 },
+    { kw: "sebagian besar guru", rank: 4 }, { kw: "hampir semua kelas", rank: 4 },
+    { kw: "ada keduanya", rank: 4 }, { kw: "ada konselor perguruan tinggi", rank: 4 },
+    { kw: "ada guru bimbingan konseling", rank: 4 }, { kw: "lengkap", rank: 4 },
+    { kw: ">300 buku", rank: 4 }, { kw: ">75% siswa", rank: 4 },
+
+    { kw: "sudah ada tetapi belum optimal", rank: 3 }, { kw: "sudah ada kandidat", rank: 3 },
+    { kw: "sudah menggunakan sistem gratis", rank: 3 }, { kw: "sudah beberapa kali", rank: 3 },
+    { kw: "100-200 buku", rank: 3 }, { kw: "50-75% siswa", rank: 3 },
+    { kw: "cukup memahami", rank: 3 }, { kw: "memadai", rank: 3 },
+    { kw: "baik", rank: 3 }, { kw: "ada", rank: 3 },
+
+    { kw: "ada namun terbatas", rank: 2 }, { kw: "sebagian tersedia", rank: 2 },
+    { kw: "sebagian kelas", rank: 2 }, { kw: "ada untuk sebagian lab", rank: 2 },
+    { kw: "kadang tersedia", rank: 2 }, { kw: "sebagian kecil guru", rank: 2 },
+    { kw: "ya, sebagian kecil", rank: 2 }, { kw: "sedang dipersiapkan", rank: 2 },
+    { kw: "sedang merencanakan", rank: 2 }, { kw: "20-50% siswa", rank: 2 },
+    { kw: "0-100 buku", rank: 2 }, { kw: "cukup", rank: 2 }, { kw: "tersedia terbatas", rank: 2 },
+
+    { kw: "masih sangat terbatas", rank: 1 }, { kw: "sangat terbatas", rank: 1 },
+    { kw: "kurang memahami", rank: 1 }, { kw: "belum memadai", rank: 1 },
+    { kw: "perlu pengembangan", rank: 1 }, { kw: "pernah sekali", rank: 1 },
+    { kw: "terbatas", rank: 1 },
+
+    { kw: "belum ada sistem", rank: 0 }, { kw: "belum tersedia", rank: 0 },
+    { kw: "belum memahami", rank: 0 }, { kw: "belum menentukan", rank: 0 },
+    { kw: "tidak ada", rank: 0 }, { kw: "tidak pernah", rank: 0 }, { kw: "belum ada", rank: 0 },
+  ].sort((a, b) => b.kw.length - a.kw.length);
+
+  function positivityRank(answer){
+    const a = (answer || '').toString().trim().toLowerCase();
+    if (!a) return null;
+    for (const { kw, rank } of KEYWORD_RANKS){
+      if (a.includes(kw)) return rank;
+    }
+    if (!isNaN(parseFloat(a)) && isFinite(a)) return parseFloat(a); // jawaban angka (mis. skala 1-5)
+    return null; // jawaban jenis pilihan biasa, bukan skala bagus/kurang
+  }
+
+  function bestAnswerInCategory(row, cols){
+    let best = null;
+    cols.forEach(col => {
+      const val = row[col];
+      const rank = positivityRank(val);
+      if (rank !== null && (best === null || rank > best.rank)){
+        best = { col, val, rank };
+      }
+    });
+    return best;
+  }
+
   const statusEl = document.getElementById('status');
   const statsRow = document.getElementById('statsRow');
   const searchBox = document.getElementById('searchBox');
@@ -283,12 +354,18 @@
     const name = row[SCHOOL_COLUMN] || '(Tanpa nama)';
 
     const catRows = Object.entries(GROUPED).filter(([k,cols]) => cols.length > 0).map(([key, cols]) => {
-      const filled = cols.filter(c => (row[c] || '').toString().trim() !== '').length;
       const cat = CATEGORIES[key];
+      const best = bestAnswerInCategory(row, cols);
+      const highlightHTML = best
+        ? `<div class="highlight-box">
+             <div class="highlight-q">${shortLabel(best.col)}</div>
+             <div class="highlight-a" style="color:${cat.color}">✨ ${best.val}</div>
+           </div>`
+        : `<div class="highlight-box highlight-empty">Belum ada sorotan otomatis untuk area ini</div>`;
       return `
-        <div class="cat-row">
-          <span class="cat-label"><span class="dot" style="background:${cat.color}"></span>${cat.label}</span>
-          <span class="cat-count">${filled}/${cols.length} terisi</span>
+        <div class="cat-block">
+          <div class="cat-label"><span class="dot" style="background:${cat.color}"></span>${cat.label}</div>
+          ${highlightHTML}
         </div>`;
     }).join('');
 
