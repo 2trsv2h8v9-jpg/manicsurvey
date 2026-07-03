@@ -1,680 +1,497 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Kesiapan Implementasi IBDP</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Kesiapan IBDP</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
   :root{
-    --canvas:#F5F3FA;
-    --surface:#FFFFFF;
-    --surface-soft:#EFECF9;
-    --ink:#2E2A45;
-    --ink-soft:#726C87;
-    --ink-faint:#9D97B0;
-    --primary:#8B85C1;
-    --primary-dark:#6D66A8;
-    --mint:#5FB690;
-    --mint-soft:#DEF2E8;
-    --coral:#DE8080;
-    --coral-soft:#FBE4E4;
-    --gold:#CE9A44;
-    --gold-soft:#F6E7CC;
-    --border:#E4E0F1;
-    --shadow: 0 10px 28px -14px rgba(46,42,69,0.22);
-    --shadow-soft: 0 4px 14px -8px rgba(46,42,69,0.16);
+    --bg: #f3f5fb;
+    --card-bg: #ffffff;
+    --card-border: #e6e9f2;
+    --text: #1e2433;
+    --text-dim: #6b7386;
+    --header-start: #4338ca;
+    --header-end: #2563eb;
+    --blue: #2563eb;
+    --violet: #7c3aed;
+    --amber: #d97706;
+    --emerald: #059669;
+    --font-display: 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
   }
-
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  *{ box-sizing: border-box; }
   body{
     margin:0;
-    background:var(--canvas);
-    color:var(--ink);
-    font-family:'Manrope', sans-serif;
-    -webkit-font-smoothing:antialiased;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
   }
-  h1,h2,h3{ font-family:'Fraunces', serif; margin:0; }
-  p{ margin:0; }
-  button, select, input{ font-family:inherit; }
-  *:focus-visible{ outline:2px solid var(--primary-dark); outline-offset:3px; border-radius:4px; }
+  .header{
+    background: linear-gradient(120deg, var(--header-start), var(--header-end));
+    color: white;
+    padding: 28px 24px;
+  }
+  .header .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 6px;
+  }
+  .header h1{ margin: 0; font-size: 26px; font-weight: 700; }
+  .header .subtitle{ opacity: 0.85; margin-top: 6px; font-size: 14px; }
 
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+  .wrap{ max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
 
-  /* ---------- HERO ---------- */
-  .hero{
-    background:linear-gradient(150deg, #EDEAFB 0%, #F5F3FA 55%, #F7F2F6 100%);
-    border-bottom:1px solid var(--border);
-    padding:52px 0 40px;
-    position:relative;
-    overflow:hidden;
+  .config-box{
+    background: #fffbea;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #92400e;
   }
-  .hero-inner{
-    position:relative;
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:32px;
-  }
-  .hero-text{ max-width:640px; }
-  .eyebrow{
-    font-size:12.5px;
-    font-weight:700;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--primary-dark);
-    margin-bottom:14px;
-  }
-  .hero-text h1{
-    font-size:40px;
-    font-weight:600;
-    line-height:1.12;
-    color:var(--ink);
-    margin-bottom:14px;
-  }
-  .subtitle{
-    font-size:16px;
-    line-height:1.6;
-    color:var(--ink-soft);
-    max-width:540px;
-  }
-  .hero-meta{
-    margin-top:24px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .meta-pill{
-    font-size:13px;
-    font-weight:600;
-    color:var(--ink-soft);
-    background:var(--surface);
-    border:1px solid var(--border);
-    padding:7px 14px;
-    border-radius:999px;
-  }
-  .meta-pill.live::before{ content:"●"; color:var(--mint); margin-right:6px; }
-  .meta-pill.offline::before{ content:"●"; color:var(--gold); margin-right:6px; }
-  .refresh-btn{
-    font-size:13px;
-    font-weight:700;
-    color:#fff;
-    background:var(--primary);
-    border:none;
-    padding:9px 18px;
-    border-radius:999px;
-    cursor:pointer;
-    transition:background 0.15s ease, transform 0.15s ease;
-  }
-  .refresh-btn:hover{ background:var(--primary-dark); }
-  .refresh-btn:active{ transform:scale(0.97); }
-  .refresh-btn:disabled{ opacity:0.6; cursor:progress; }
-
-  .rosette{
-    flex-shrink:0;
-    width:150px;
-    height:150px;
-    opacity:0.9;
+  .config-box code{
+    color: #92400e;
+    font-family: var(--font-mono);
+    background: #fef3c7;
+    padding: 2px 6px;
+    border-radius: 4px;
   }
 
-  /* ---------- SECTIONS ---------- */
-  .section-title{
-    font-size:14px;
-    font-weight:700;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-bottom:16px;
+  #status{ font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); margin-bottom: 18px; }
+  #status.error{ color: #dc2626; }
+  #status.ok{ color: var(--emerald); }
+
+  .stats-row{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .stat-card{
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+  }
+  .stat-label{ font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  .stat-value{ font-size: 24px; font-weight: 700; }
+
+  .search-row{ margin-bottom: 20px; }
+  #searchBox{
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: var(--font-display);
+    box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+  }
+  #searchBox:focus{ outline: 2px solid var(--blue); outline-offset: 1px; }
+
+  .school-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .school-card{
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.06);
+  }
+  .school-card h3{ margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+
+  .cat-block{
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--card-border);
+  }
+  .cat-block:last-of-type{ border-bottom: none; }
+  .cat-label{ display:flex; align-items:center; gap: 8px; color: var(--text); font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .dot{ width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .highlight-box{
+    background: #f8f9fc;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+  }
+  .highlight-q{ color: var(--text-dim); margin-bottom: 2px; }
+  .highlight-a{ font-weight: 700; }
+  .highlight-empty{ color: var(--text-dim); font-style: italic; }
+  .disclaimer{
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    background: #f8f9fc;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 14px;
   }
 
-  .summary{ padding:44px 0 8px; }
-  .summary-grid{
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:18px;
+  .detail-toggle{
+    width: 100%;
+    margin-top: 14px;
+    background: #eef2ff;
+    color: var(--header-start);
+    border: none;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-display);
   }
-  .stat-tile{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:22px 22px 20px;
-    box-shadow:var(--shadow-soft);
-  }
-  .stat-label{
-    font-size:12.5px;
-    font-weight:700;
-    letter-spacing:0.04em;
-    color:var(--ink-faint);
-    text-transform:uppercase;
-    margin-bottom:10px;
-  }
-  .stat-value{
-    font-family:'Fraunces', serif;
-    font-size:34px;
-    font-weight:600;
-    color:var(--ink);
-    line-height:1;
-  }
-  .stat-value small{
-    font-family:'Manrope', sans-serif;
-    font-size:14px;
-    font-weight:700;
-    color:var(--ink-faint);
-    margin-left:4px;
-  }
-  .stat-sub{
-    margin-top:8px;
-    font-size:13px;
-    color:var(--ink-soft);
-  }
-  .stat-tile.top-school .stat-value{ font-size:22px; line-height:1.25; }
+  .detail-toggle:hover{ background: #e0e7ff; }
 
-  .dist-bar{
-    display:flex;
-    width:100%;
-    height:10px;
-    border-radius:999px;
-    overflow:hidden;
-    margin-top:12px;
-    background:var(--surface-soft);
+  .modal-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
   }
-  .dist-seg{ height:100%; }
-  .dist-legend{
-    margin-top:12px;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
+  .modal-overlay.open{ display: flex; }
+  .modal-box{
+    background: var(--card-bg);
+    border-radius: 16px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px 26px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    position: relative;
   }
-  .dist-legend-item{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:13px;
-    color:var(--ink-soft);
+  .modal-close{
+    position: sticky;
+    top: 0;
+    float: right;
+    background: #f1f3f9;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-dim);
   }
-  .dist-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .dist-legend-item strong{ color:var(--ink); }
+  .modal-close:hover{ background: #e6e9f2; }
+  .modal-title{ font-size: 18px; font-weight: 700; margin: 0 0 16px; padding-right: 40px; }
+  .detail-cat-title{
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 14px 0 6px;
+  }
+  .qa-item{ font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f3f9; }
+  .qa-q{ color: var(--text-dim); margin-bottom: 2px; }
+  .qa-a{ font-weight: 600; }
 
-  /* ---------- CONTROLS ---------- */
-  .controls{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    padding:28px 0 20px;
-  }
-  .search-field{
-    flex:1 1 260px;
-    position:relative;
-  }
-  .search-field input{
-    width:100%;
-    padding:12px 16px 12px 40px;
-    border-radius:12px;
-    border:1px solid var(--border);
-    background:var(--surface);
-    font-size:14px;
-    color:var(--ink);
-  }
-  .search-field input::placeholder{ color:var(--ink-faint); }
-  .search-field svg{
-    position:absolute;
-    left:14px;
-    top:50%;
-    transform:translateY(-50%);
-    color:var(--ink-faint);
-  }
-  .controls select{
-    padding:12px 16px;
-    border-radius:12px;
-    border:1px solid var(--border);
-    background:var(--surface);
-    font-size:14px;
-    color:var(--ink);
-    cursor:pointer;
-  }
-  .result-count{
-    margin-left:auto;
-    font-size:13px;
-    font-weight:700;
-    color:var(--ink-soft);
-    white-space:nowrap;
-  }
-
-  /* ---------- CARDS ---------- */
-  .cards{
-    padding:8px 0 60px;
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(330px, 1fr));
-    gap:20px;
-  }
-  .card{
-    position:relative;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:20px;
-    padding:24px;
-    box-shadow:var(--shadow-soft);
-    transition:transform 0.18s ease, box-shadow 0.18s ease;
-  }
-  .card:hover{ transform:translateY(-3px); box-shadow:var(--shadow); }
-  .card.rank-1{
-    border-color:#EAD7A4;
-    box-shadow:0 0 0 1px #EAD7A4 inset, var(--shadow);
-  }
-
-  .rank-badge{
-    position:absolute;
-    top:-12px;
-    left:20px;
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:15px;
-    color:#fff;
-    background:var(--primary);
-    border:3px solid var(--canvas);
-  }
-  .card.rank-1 .rank-badge{ background:linear-gradient(135deg,#E3B873,#CE9A44); }
-  .card.rank-2 .rank-badge{ background:linear-gradient(135deg,#B9B4D6,#9992C2); }
-  .card.rank-3 .rank-badge{ background:linear-gradient(135deg,#D9B08C,#C6905F); }
-
-  .card-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
-    margin-top:8px;
-  }
-  .card-heading h3{
-    font-size:19px;
-    font-weight:600;
-    color:var(--ink);
-    line-height:1.3;
-  }
-  .card-meta{
-    margin-top:6px;
-    font-size:12.5px;
-    color:var(--ink-faint);
-  }
-  .student-tag{
-    display:inline-block;
-    margin-top:10px;
-    font-size:12px;
-    font-weight:700;
-    color:var(--primary-dark);
-    background:var(--surface-soft);
-    padding:4px 10px;
-    border-radius:999px;
-  }
-
-  .ring-wrap{ position:relative; width:84px; height:84px; flex-shrink:0; }
-  .ring-wrap svg{ transform:rotate(-90deg); }
-  .ring-score{
-    position:absolute; inset:0;
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column;
-  }
-  .ring-score b{ font-family:'Fraunces', serif; font-size:20px; font-weight:600; color:var(--ink); }
-  .ring-score span{ font-size:9.5px; color:var(--ink-faint); font-weight:700; letter-spacing:0.03em; }
-
-  .subscores{
-    margin-top:20px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .subscore-row{ display:flex; flex-direction:column; gap:5px; }
-  .subscore-label{
-    display:flex;
-    justify-content:space-between;
-    font-size:12.5px;
-    font-weight:700;
-    color:var(--ink-soft);
-  }
-  .subscore-track{
-    width:100%; height:7px;
-    background:var(--surface-soft);
-    border-radius:999px;
-    overflow:hidden;
-  }
-  .subscore-fill{ height:100%; border-radius:999px; }
-
-  .tier-badge{
-    margin-top:18px;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    font-size:12.5px;
-    font-weight:700;
-    padding:6px 13px;
-    border-radius:999px;
-  }
-
-  .empty-state{
-    grid-column:1/-1;
-    text-align:center;
-    padding:60px 20px;
-    color:var(--ink-soft);
-    background:var(--surface);
-    border:1px dashed var(--border);
-    border-radius:18px;
-  }
-  .empty-state h3{ font-size:18px; color:var(--ink); margin-bottom:8px; }
-
-  .footer{
-    border-top:1px solid var(--border);
-    padding:24px 0 40px;
-    text-align:center;
-    font-size:12.5px;
-    color:var(--ink-faint);
-  }
-
-  @media (max-width:760px){
-    .wrap{ padding:0 18px; }
-    .hero{ padding:40px 0 32px; }
-    .hero-inner{ flex-direction:column; align-items:flex-start; }
-    .hero-text h1{ font-size:30px; }
-    .rosette{ display:none; }
-    .summary-grid{ grid-template-columns:1fr 1fr; }
-    .result-count{ margin-left:0; width:100%; }
-  }
-  @media (max-width:480px){
-    .summary-grid{ grid-template-columns:1fr; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ transition:none !important; scroll-behavior:auto !important; }
-  }
+  footer{ text-align:center; color: var(--text-dim); font-size: 12px; margin-top: 32px; }
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="wrap hero-inner">
-    <div class="hero-text">
-      <p class="eyebrow">Penilaian Kesiapan Program IB Diploma</p>
-      <h1>Dashboard Kesiapan Implementasi IBDP</h1>
-      <p class="subtitle">Memetakan kesiapan setiap sekolah untuk mengadopsi International Baccalaureate Diploma Programme, berdasarkan kesiapan implementasi kurikulum dan kesiapan infrastruktur — diurutkan dari yang paling siap.</p>
-      
-        <button id="refreshBtn" class="refresh-btn" type="button">Segarkan data</button>
-      </div>
-    </div>
-    <svg class="rosette" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="75" cy="75" r="70" stroke="#8B85C1" stroke-opacity="0.18" stroke-width="1.5"/>
-      <circle cx="75" cy="75" r="52" stroke="#8B85C1" stroke-opacity="0.28" stroke-width="1.5"/>
-      <circle cx="75" cy="75" r="6" fill="#8B85C1" fill-opacity="0.5"/>
-      <g stroke="#8B85C1" stroke-opacity="0.4" stroke-width="1.5">
-        <line x1="75" y1="5" x2="75" y2="20"/>
-        <line x1="75" y1="130" x2="75" y2="145"/>
-        <line x1="5" y1="75" x2="20" y2="75"/>
-        <line x1="130" y1="75" x2="145" y2="75"/>
-      </g>
-      <path d="M75 23 L82 75 L75 127 L68 75 Z" fill="#8B85C1" fill-opacity="0.35"/>
-    </svg>
+<div class="header">
+  <div class="eyebrow">Dashboard Survei</div>
+  <h1>Kesiapan Otorisasi IBDP</h1>
+  <div class="subtitle">Ringkasan self-assessment per sekolah, dikelompokkan berdasarkan area kesiapan.</div>
+</div>
+
+<div class="wrap">
+
+  <div id="status">Mengambil data...</div>
+
+  <div class="stats-row" id="statsRow"></div>
+
+  <div class="search-row">
+    <input type="text" id="searchBox" placeholder="Cari nama sekolah..." />
   </div>
-</header>
 
-<main class="wrap">
 
-  <section class="summary" aria-label="Ringkasan Eksekutif">
-    <p class="section-title">Ringkasan Eksekutif</p>
-    <div class="summary-grid" id="summaryGrid"></div>
-  </section>
+  <div class="school-grid" id="schoolGrid"></div>
 
-  <section class="controls" aria-label="Filter sekolah">
-    <div class="search-field">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="search" id="searchInput" placeholder="Cari nama sekolah…" aria-label="Cari nama sekolah">
-    </div>
-    <select id="tierFilter" aria-label="Filter tingkat kesiapan">
-      <option value="all">Semua Tingkat Kesiapan</option>
-      <option value="siap">Siap</option>
-      <option value="cukup">Cukup Siap</option>
-      <option value="perlu">Perlu Persiapan</option>
-    </select>
-    <select id="studentFilter" aria-label="Filter jumlah siswa">
-      <option value="all">Semua Jumlah Siswa</option>
-    </select>
-    <span class="result-count" id="resultCount"></span>
-  </section>
+  <footer>Dibuat dengan HTML, di-hosting di Vercel.</footer>
+</div>
 
-  <section class="cards" id="cardsGrid" aria-live="polite"></section>
-
-</main>
-
-<footer class="footer">
-  Data bersumber dari formulir kesiapan sekolah (Google Sheets) · Skor kesiapan dihitung dari rata-rata kesiapan implementasi IBDP dan kesiapan infrastruktur, diskalakan menjadi 0–100.
-</footer>
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeDetail()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    <div class="modal-title" id="modalTitle"></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
 
 <script>
-  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSJTcisMHTFP0xtfRr_CSQoBACp9vXq5bEn-UpyRyy8F1qEyrr6NtDIFj6wrXLsSVBwQ1vz2IWUdUp2/pub?output=csv';
+  // ============================================================
+  // GANTI INI dengan link CSV dari Google Sheets kamu
+  // (File > Share > Publish to web > pilih format CSV)
+  // ============================================================
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/GANTI-DENGAN-ID-SHEET-KAMU/pub?output=csv";
 
-  // Snapshot fallback, used if the live sheet cannot be reached from the browser.
-  const FALLBACK_ROWS = [
-    { "Timestamp":"03/07/2026 16:54:57", "Nama sekolah":"SMA Trial Perdana", "Kesiapan implementasi IBDP":"3", "Kesiapan infrastruktur":"2", "Jumlah siswa":">100" },
-    { "Timestamp":"03/07/2026 16:55:12", "Nama sekolah":"SMA Manchester", "Kesiapan implementasi IBDP":"4", "Kesiapan infrastruktur":"4", "Jumlah siswa":"<50" },
-    { "Timestamp":"03/07/2026 16:55:27", "Nama sekolah":"SMA Khadafi Mardani", "Kesiapan implementasi IBDP":"2", "Kesiapan infrastruktur":"4", "Jumlah siswa":"<50" }
-  ];
+  const SCHOOL_COLUMN = "Sebutkan nama sekolah Anda";
+  const IGNORE_COLUMNS = ["Timestamp", SCHOOL_COLUMN];
 
-  const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  // Pengelompokan kriteria ke 4 area (murni pengelompokan, bukan penilaian baik/buruk)
+  const CATEGORIES = {
+    leadership: { label: "Kepemimpinan & SDM", color: "#2563eb" },
+    curriculum: { label: "Kurikulum & Pembelajaran", color: "#7c3aed" },
+    facility:   { label: "Fasilitas & Teknologi", color: "#d97706" },
+    admin:      { label: "Administrasi & Pembiayaan", color: "#059669" },
+    other:      { label: "Lainnya", color: "#6b7386" },
+  };
 
-  let allSchools = [];
+  const COLUMN_CATEGORY = {
+    "Kepala sekolah memiliki kemampuan Bahasa Inggris aktif": "leadership",
+    "Minimal sebagian guru mampu mengajar dalam Bahasa Inggris": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Bahasa Indonesia]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Bahasa Inggris]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Matematika]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Economy]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [History]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Biology]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Chemistry]": "leadership",
+    "Sekolah memiliki guru untuk mata pelajaran berikut [Physics]": "leadership",
+    "Guru memiliki latar belakang akademik sesuai mata pelajaran": "leadership",
+    "Sekolah memiliki guru dengan pengalaman mengajar kurikulum internasional": "leadership",
+    "Kepala sekolah pernah mengikuti workshop profesional dari IBDP.": "leadership",
+    "Sekolah dapat menunjuk PIC khusus untuk pengembangan IB Diploma Programme.": "leadership",
+    "Sekolah memiliki konselor perguruan tinggi dan atau guru bimbingan konseling.": "leadership",
+    "Sekolah memiliki staf IT yang mendukung implementasi pembelajaran digital.": "leadership",
+    "Sekolah memiliki asisten laboratorium sains.": "leadership",
 
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+    "Guru terbiasa membuat perencanaan pembelajaran": "curriculum",
+    "Guru terbiasa menggunakan student-centered learning*\n\n*student-centered learning: pembelajaran yang mendorong siswa aktif bertanya, berdiskusi, mengeksplorasi, dan membangun pemahaman sendiri.": "curriculum",
+    "Sekolah memiliki sistem pengecekan plagiarisme seperti Turnitin atau Google for Education.": "curriculum",
+    "Sekolah memiliki sistem pelaporan hasil belajar siswa.": "curriculum",
+    "Sekolah memiliki LMS pembelajaran.": "curriculum",
 
-  function formatDate(ts){
-    if(!ts) return '';
-    const datePart = ts.split(' ')[0];
-    const bits = datePart.split('/');
-    if(bits.length !== 3) return ts;
-    const [dd, mm, yyyy] = bits;
-    const mi = parseInt(mm, 10) - 1;
-    return `${parseInt(dd,10)} ${MONTHS[mi] || mm} ${yyyy}`;
-  }
+    "Ruang kelas memiliki proyektor atau smart TV.": "facility",
+    "Koneksi internet stabil di area belajar utama.": "facility",
+    "Guru memiliki akses laptop atau perangkat digital.": "facility",
+    "Siswa kelas 10 sampai 12 memiliki akses perangkat digital untuk pembelajaran.": "facility",
+    "Laboratorium sains tersedia dan dapat digunakan. [Lab biologi]": "facility",
+    "Laboratorium sains tersedia dan dapat digunakan. [Lab kimia]": "facility",
+    "Laboratorium sains tersedia dan dapat digunakan. [Lab fisika]": "facility",
+    "Laboratorium memiliki standar keamanan dasar (P3K, APK, selimut api, dll).": "facility",
+    "Perpustakaan tersedia.": "facility",
+    "Perpustakaan memiliki system pencatatan buku (contoh OPAC).": "facility",
+    "Perpustakaan memiliki sumber belajar berbahasa Inggris.": "facility",
 
-  function getTier(score){
-    if(score >= 75) return { key:'siap', label:'Siap', color:'var(--mint)', soft:'var(--mint-soft)' };
-    if(score >= 50) return { key:'cukup', label:'Cukup Siap', color:'var(--gold)', soft:'var(--gold-soft)' };
-    return { key:'perlu', label:'Perlu Persiapan', color:'var(--coral)', soft:'var(--coral-soft)' };
-  }
+    "Sekolah memiliki ruang bimbingan konseling.": "admin",
+    "Sekolah memahami estimasi biaya IB": "admin",
+    "Sekolah memiliki biaya pengembangan profesional guru": "admin",
+  };
 
-  function normalizeRows(rows){
-    return rows
-      .filter(r => r['Nama sekolah'] && r['Nama sekolah'].trim())
-      .map(r => {
-        const ibdp = parseFloat(r['Kesiapan implementasi IBDP']) || 0;
-        const infra = parseFloat(r['Kesiapan infrastruktur']) || 0;
-        const score = Math.round(((ibdp + infra) / 8) * 100 * 10) / 10;
-        return {
-          name: r['Nama sekolah'].trim(),
-          timestamp: r['Timestamp'] || '',
-          ibdp, infra, score,
-          students: (r['Jumlah siswa'] || '').trim(),
-          tier: getTier(score)
-        };
-      })
-      .sort((a,b) => b.score - a.score);
-  }
+  // Kamus kata kunci untuk menebak "seberapa positif" sebuah jawaban (0=kurang, 4=terbaik).
+  // Dicocokkan dari frasa terpanjang dulu supaya "belum tersedia" tidak salah kena "tersedia".
+  const KEYWORD_RANKS = [
+    { kw: "sangat baik", rank: 4 }, { kw: "sangat memadai", rank: 4 },
+    { kw: "ada dan aktif digunakan", rank: 4 }, { kw: "tersedia & aktif", rank: 4 },
+    { kw: "ada untuk semua lab", rank: 4 }, { kw: "rutin tersedia", rank: 4 },
+    { kw: "sudah digunakan secara aktif", rank: 4 }, { kw: "sudah ada pic", rank: 4 },
+    { kw: "sudah menggunakan sistem berbayar", rank: 4 }, { kw: "ya, sebagian besar", rank: 4 },
+    { kw: "sebagian besar guru", rank: 4 }, { kw: "hampir semua kelas", rank: 4 },
+    { kw: "ada keduanya", rank: 4 }, { kw: "ada konselor perguruan tinggi", rank: 4 },
+    { kw: "ada guru bimbingan konseling", rank: 4 }, { kw: "lengkap", rank: 4 },
+    { kw: ">300 buku", rank: 4 }, { kw: ">75% siswa", rank: 4 },
 
-  async function loadData(){
-    try{
-      const res = await fetch(CSV_URL, { cache:'no-store' });
-      if(!res.ok) throw new Error('network');
-      const text = await res.text();
-      const parsed = Papa.parse(text.trim(), { header:true, skipEmptyLines:true });
-      if(!parsed.data || !parsed.data.length) throw new Error('empty');
-      return { rows: normalizeRows(parsed.data), live:true };
-    }catch(e){
-      return { rows: normalizeRows(FALLBACK_ROWS), live:false };
+    { kw: "sudah ada tetapi belum optimal", rank: 3 }, { kw: "sudah ada kandidat", rank: 3 },
+    { kw: "sudah menggunakan sistem gratis", rank: 3 }, { kw: "sudah beberapa kali", rank: 3 },
+    { kw: "100-200 buku", rank: 3 }, { kw: "50-75% siswa", rank: 3 },
+    { kw: "cukup memahami", rank: 3 }, { kw: "memadai", rank: 3 },
+    { kw: "baik", rank: 3 }, { kw: "ada", rank: 3 },
+
+    { kw: "ada namun terbatas", rank: 2 }, { kw: "sebagian tersedia", rank: 2 },
+    { kw: "sebagian kelas", rank: 2 }, { kw: "ada untuk sebagian lab", rank: 2 },
+    { kw: "kadang tersedia", rank: 2 }, { kw: "sebagian kecil guru", rank: 2 },
+    { kw: "ya, sebagian kecil", rank: 2 }, { kw: "sedang dipersiapkan", rank: 2 },
+    { kw: "sedang merencanakan", rank: 2 }, { kw: "20-50% siswa", rank: 2 },
+    { kw: "0-100 buku", rank: 2 }, { kw: "cukup", rank: 2 }, { kw: "tersedia terbatas", rank: 2 },
+
+    { kw: "masih sangat terbatas", rank: 1 }, { kw: "sangat terbatas", rank: 1 },
+    { kw: "kurang memahami", rank: 1 }, { kw: "belum memadai", rank: 1 },
+    { kw: "perlu pengembangan", rank: 1 }, { kw: "pernah sekali", rank: 1 },
+    { kw: "terbatas", rank: 1 },
+
+    { kw: "belum ada sistem", rank: 0 }, { kw: "belum tersedia", rank: 0 },
+    { kw: "belum memahami", rank: 0 }, { kw: "belum menentukan", rank: 0 },
+    { kw: "tidak ada", rank: 0 }, { kw: "tidak pernah", rank: 0 }, { kw: "belum ada", rank: 0 },
+  ].sort((a, b) => b.kw.length - a.kw.length);
+
+  function positivityRank(answer){
+    const a = (answer || '').toString().trim().toLowerCase();
+    if (!a) return null;
+    for (const { kw, rank } of KEYWORD_RANKS){
+      if (a.includes(kw)) return rank;
     }
+    if (!isNaN(parseFloat(a)) && isFinite(a)) return parseFloat(a); // jawaban angka (mis. skala 1-5)
+    return null; // jawaban jenis pilihan biasa, bukan skala bagus/kurang
   }
 
-  function ringMarkup(score, color){
-    const r = 32, c = 2 * Math.PI * r;
-    const filled = (Math.min(score,100) / 100) * c;
+  function bestAnswerInCategory(row, cols){
+    let best = null;
+    cols.forEach(col => {
+      const val = row[col];
+      const rank = positivityRank(val);
+      if (rank !== null && (best === null || rank > best.rank)){
+        best = { col, val, rank };
+      }
+    });
+    return best;
+  }
+
+  const statusEl = document.getElementById('status');
+  const statsRow = document.getElementById('statsRow');
+  const searchBox = document.getElementById('searchBox');
+  const schoolGrid = document.getElementById('schoolGrid');
+
+  let ROWS = [];
+  let QUESTION_COLUMNS = [];
+  let GROUPED = {}; // catKey -> [columns]
+  let DETAILS = {}; // idx -> { name, html }
+
+  function shortLabel(col){
+    return col.length > 90 ? col.slice(0, 90) + '…' : col;
+  }
+
+  function buildGroups(){
+    GROUPED = {};
+    Object.keys(CATEGORIES).forEach(k => GROUPED[k] = []);
+    QUESTION_COLUMNS.forEach(col => {
+      const cat = COLUMN_CATEGORY[col] || "other";
+      GROUPED[cat].push(col);
+    });
+  }
+
+  function renderStats(){
+    const schools = new Set(ROWS.map(r => r[SCHOOL_COLUMN])).size;
+    const cards = [
+      { label: 'Sekolah Mengisi', value: schools },
+      { label: 'Jumlah Kriteria', value: QUESTION_COLUMNS.length },
+      { label: 'Total Respons', value: ROWS.length },
+    ];
+    statsRow.innerHTML = cards.map(c => `
+      <div class="stat-card">
+        <div class="stat-label">${c.label}</div>
+        <div class="stat-value">${c.value}</div>
+      </div>
+    `).join('');
+  }
+
+  function schoolCardHTML(row, idx){
+    const name = row[SCHOOL_COLUMN] || '(Tanpa nama)';
+
+    const catRows = Object.entries(GROUPED).filter(([k,cols]) => cols.length > 0).map(([key, cols]) => {
+      const cat = CATEGORIES[key];
+      const best = bestAnswerInCategory(row, cols);
+      const highlightHTML = best
+        ? `<div class="highlight-box">
+             <div class="highlight-q">${shortLabel(best.col)}</div>
+             <div class="highlight-a" style="color:${cat.color}">✨ ${best.val}</div>
+           </div>`
+        : `<div class="highlight-box highlight-empty">Belum ada sorotan otomatis untuk area ini</div>`;
+      return `
+        <div class="cat-block">
+          <div class="cat-label"><span class="dot" style="background:${cat.color}"></span>${cat.label}</div>
+          ${highlightHTML}
+        </div>`;
+    }).join('');
+
+    const detailHTML = Object.entries(GROUPED).filter(([k,cols]) => cols.length > 0).map(([key, cols]) => {
+      const cat = CATEGORIES[key];
+      const items = cols.map(c => `
+        <div class="qa-item">
+          <div class="qa-q">${shortLabel(c)}</div>
+          <div class="qa-a" style="color:${cat.color}">${row[c] || '(kosong)'}</div>
+        </div>
+      `).join('');
+      return `<div class="detail-cat-title" style="color:${cat.color}">${cat.label}</div>${items}`;
+    }).join('');
+
+    DETAILS[idx] = { name, html: detailHTML };
+
     return `
-      <svg width="84" height="84" viewBox="0 0 84 84">
-        <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--surface-soft)" stroke-width="8"/>
-        <circle cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="8"
-          stroke-linecap="round" stroke-dasharray="${filled} ${c}"/>
-      </svg>`;
-  }
-
-  function renderSummary(schools){
-    const total = schools.length;
-    const avg = total ? Math.round((schools.reduce((s,x)=>s+x.score,0) / total) * 10) / 10 : 0;
-    const top = schools[0];
-    const counts = { siap:0, cukup:0, perlu:0 };
-    schools.forEach(s => counts[s.tier.key]++);
-
-    const grid = document.getElementById('summaryGrid');
-    grid.innerHTML = `
-      <div class="stat-tile">
-        <p class="stat-label">Total Sekolah Dinilai</p>
-        <p class="stat-value">${total}</p>
-        <p class="stat-sub">sekolah mengisi formulir kesiapan</p>
-      </div>
-      <div class="stat-tile">
-        <p class="stat-label">Rata-rata Skor Kesiapan</p>
-        <p class="stat-value">${avg}<small>/100</small></p>
-        <p class="stat-sub">gabungan kesiapan IBDP &amp; infrastruktur</p>
-      </div>
-      <div class="stat-tile top-school">
-        <p class="stat-label">Sekolah Paling Siap</p>
-        <p class="stat-value">${top ? escapeHtml(top.name) : '—'}</p>
-        <p class="stat-sub">${top ? `Skor ${top.score}/100 · ${top.tier.label}` : 'Belum ada data'}</p>
-      </div>
-      <div class="stat-tile">
-        <p class="stat-label">Distribusi Tingkat Kesiapan</p>
-        <div class="dist-bar">
-          ${counts.siap ? `<div class="dist-seg" style="width:${counts.siap/total*100}%;background:var(--mint)"></div>` : ''}
-          ${counts.cukup ? `<div class="dist-seg" style="width:${counts.cukup/total*100}%;background:var(--gold)"></div>` : ''}
-          ${counts.perlu ? `<div class="dist-seg" style="width:${counts.perlu/total*100}%;background:var(--coral)"></div>` : ''}
-        </div>
-        <div class="dist-legend">
-          <div class="dist-legend-item"><span class="dist-dot" style="background:var(--mint)"></span>Siap <strong>${counts.siap}</strong></div>
-          <div class="dist-legend-item"><span class="dist-dot" style="background:var(--gold)"></span>Cukup Siap <strong>${counts.cukup}</strong></div>
-          <div class="dist-legend-item"><span class="dist-dot" style="background:var(--coral)"></span>Perlu Persiapan <strong>${counts.perlu}</strong></div>
-        </div>
+      <div class="school-card" data-name="${name.toLowerCase()}">
+        <h3>${name}</h3>
+        ${catRows}
+        <button class="detail-toggle" onclick="openDetail(${idx})">Lihat Detail Jawaban</button>
       </div>
     `;
   }
 
-  function renderStudentFilterOptions(schools){
-    const sel = document.getElementById('studentFilter');
-    const existing = new Set(Array.from(sel.options).map(o => o.value));
-    const values = [...new Set(schools.map(s => s.students).filter(Boolean))];
-    values.forEach(v => {
-      if(!existing.has(v)){
-        const opt = document.createElement('option');
-        opt.value = v; opt.textContent = `${v} siswa`;
-        sel.appendChild(opt);
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+
+  window.openDetail = function(idx){
+    const d = DETAILS[idx];
+    modalTitle.textContent = d.name;
+    modalBody.innerHTML = d.html;
+    modalOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeDetail = function(){
+    modalOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDetail();
+  });
+
+  function renderGrid(filterText){
+    const filtered = ROWS.filter(r =>
+      !filterText || (r[SCHOOL_COLUMN] || '').toLowerCase().includes(filterText.toLowerCase())
+    );
+    schoolGrid.innerHTML = filtered.map((r, i) => schoolCardHTML(r, i)).join('');
+  }
+
+  searchBox.addEventListener('input', () => renderGrid(searchBox.value));
+
+  function loadData(){
+    Papa.parse(SHEET_CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results){
+        ROWS = results.data;
+        if (!ROWS.length){
+          statusEl.textContent = 'Data kosong. Cek lagi link CSV kamu.';
+          statusEl.className = 'error';
+          return;
+        }
+        QUESTION_COLUMNS = results.meta.fields.filter(c => !IGNORE_COLUMNS.includes(c));
+        buildGroups();
+        statusEl.textContent = `Berhasil memuat ${ROWS.length} respons dari sekolah.`;
+        statusEl.className = 'ok';
+
+        renderStats();
+        renderGrid('');
+      },
+      error: function(err){
+        statusEl.textContent = 'Gagal mengambil data: ' + err.message + '. Pastikan link CSV benar dan sheet sudah di-publish.';
+        statusEl.className = 'error';
       }
     });
   }
 
-  function cardMarkup(school, rank){
-    const c = school.tier.color;
-    return `
-      <article class="card rank-${rank}">
-        <span class="rank-badge">${rank}</span>
-        <div class="card-top">
-          <div class="card-heading">
-            <h3>${escapeHtml(school.name)}</h3>
-            <p class="card-meta">Dinilai ${formatDate(school.timestamp)}</p>
-            ${school.students ? `<span class="student-tag">${escapeHtml(school.students)} siswa</span>` : ''}
-          </div>
-          <div class="ring-wrap">
-            ${ringMarkup(school.score, c)}
-            <div class="ring-score"><b>${school.score}</b><span>/ 100</span></div>
-          </div>
-        </div>
-        <div class="subscores">
-          <div class="subscore-row">
-            <div class="subscore-label"><span>Kesiapan IBDP</span><span>${school.ibdp}/4</span></div>
-            <div class="subscore-track"><div class="subscore-fill" style="width:${school.ibdp/4*100}%;background:var(--coral)"></div></div>
-          </div>
-          <div class="subscore-row">
-            <div class="subscore-label"><span>Kesiapan Infrastruktur</span><span>${school.infra}/4</span></div>
-            <div class="subscore-track"><div class="subscore-fill" style="width:${school.infra/4*100}%;background:var(--mint)"></div></div>
-          </div>
-        </div>
-        <span class="tier-badge" style="color:${c};background:${school.tier.soft}">● ${school.tier.label}</span>
-      </article>
-    `;
-  }
-
-  function renderCards(){
-    const search = document.getElementById('searchInput').value.trim().toLowerCase();
-    const tier = document.getElementById('tierFilter').value;
-    const students = document.getElementById('studentFilter').value;
-
-    const filtered = allSchools.filter(s => {
-      if(search && !s.name.toLowerCase().includes(search)) return false;
-      if(tier !== 'all' && s.tier.key !== tier) return false;
-      if(students !== 'all' && s.students !== students) return false;
-      return true;
-    });
-
-    const grid = document.getElementById('cardsGrid');
-    document.getElementById('resultCount').textContent = `${filtered.length} sekolah`;
-
-    if(!filtered.length){
-      grid.innerHTML = `
-        <div class="empty-state">
-          <h3>Tidak ada sekolah yang cocok</h3>
-          <p>Coba ubah kata kunci pencarian atau filter yang dipilih.</p>
-        </div>`;
-      return;
-    }
-
-    // allSchools is already sorted by score desc; rank reflects overall standing, not filtered position
-    grid.innerHTML = filtered
-      .map(s => cardMarkup(s, allSchools.indexOf(s) + 1))
-      .join('');
-  }
-
-  async function init(refreshing = false){
-    const badge = document.getElementById('lastUpdated');
-    const btn = document.getElementById('refreshBtn');
-    if(refreshing){ btn.disabled = true; btn.textContent = 'Menyegarkan…'; }
-
-    const { rows, live } = await loadData();
-    allSchools = rows;
-
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-    badge.className = 'meta-pill ' + (live ? 'live' : 'offline');
-    badge.textContent = live
-    
-
-    renderSummary(allSchools);
-    renderStudentFilterOptions(allSchools);
-    renderCards();
-
-    if(refreshing){ btn.disabled = false; btn.textContent = 'Segarkan data'; }
-  }
-
-  document.getElementById('searchInput').addEventListener('input', renderCards);
-  document.getElementById('tierFilter').addEventListener('change', renderCards);
-  document.getElementById('studentFilter').addEventListener('change', renderCards);
-  document.getElementById('refreshBtn').addEventListener('click', () => init(true));
-
-  init();
+  loadData();
 </script>
-
 </body>
 </html>
